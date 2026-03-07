@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Seq2Seq 模型实现
 用于聊天机器人的序列到序列转换
