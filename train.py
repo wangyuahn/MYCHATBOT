@@ -29,7 +29,7 @@ def collate_batch(batch):
     return inputs_padded, targets_padded
 
 class Trainer:
-    def __init__(self, model, dataloader, learning_rate=0.001, device=device):
+    def __init__(self, model: Seq2Seq, dataloader: DataLoader, learning_rate: float = 0.001, device: torch.device = device):
         self.model = model.to(device)
         self.dataloader = dataloader
         self.device = device

@@ -9,7 +9,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # device = torch.device('cpu')
 
 # 加载词汇表
-def load_vocab(vocab_path):
+def load_vocab(vocab_path: str):
     with open(vocab_path, 'r', encoding='utf-8') as f:
         vocab_data = json.load(f)
     # 注意：json 中 id2word 的键是字符串，需要转回整数
@@ -28,11 +28,11 @@ SOS_ID = word2id['<SOS>']
 EOS_ID = word2id['<EOS>']
 
 # 中文分词函数
-def tokenize(text):
+def tokenize(text: str):
     return list(jieba.cut(text))
 
 # 将用户输入转换为模型输入 ID 序列
-def encode_sentence(sentence):
+def encode_sentence(sentence: str):
     tokens = tokenize(sentence)
     ids = [word2id.get(token, UNK_ID) for token in tokens]
     # 添加 <SOS> 和 <EOS>
@@ -40,7 +40,7 @@ def encode_sentence(sentence):
     return torch.tensor(ids, dtype=torch.long).unsqueeze(0)  # 添加 batch 维度
 
 # 将模型输出的 ID 序列转换为可读文本
-def decode_ids(ids):
+def decode_ids(ids: list):
     # ids 是一个列表或 1D tensor
     words = []
     for idx in ids:
@@ -52,7 +52,7 @@ def decode_ids(ids):
     return ''.join(words)
 
 # 加载模型
-def load_model(model_path, vocab_size, embed_size=256, hidden_size=512, num_layers=2, dropout=0.5):
+def load_model(model_path: str, vocab_size: int, embed_size: int = 256, hidden_size: int = 512, num_layers: int = 2, dropout: float = 0.5):
     encoder = Encoder(vocab_size, embed_size, hidden_size, num_layers, dropout)
     decoder = Decoder(vocab_size, embed_size, hidden_size, num_layers, dropout)
     model = Seq2Seq(encoder, decoder, device)
@@ -62,7 +62,7 @@ def load_model(model_path, vocab_size, embed_size=256, hidden_size=512, num_laye
     return model
 
 # 推理生成回答（贪婪搜索）
-def generate_response(model, input_tensor, max_len=100):
+def generate_response(model: Seq2Seq, input_tensor: torch.Tensor, max_len=100):
     with torch.no_grad():
         input_tensor = input_tensor.to(device)
         # 编码器前向
