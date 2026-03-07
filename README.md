@@ -85,10 +85,10 @@ python chat.py
 在 `chat.py` 中，模型参数设置如下：
 
 ```python
-EMBED_SIZE = 64      # 词嵌入维度
-HIDDEN_SIZE = 32     # 隐藏层维度
-NUM_LAYERS = 2       # RNN 层数
-DROPOUT = 0.4        #  dropout 率
+EMBED_SIZE = 512      # 词嵌入维度
+HIDDEN_SIZE = 512     # 隐藏层维度
+NUM_LAYERS = 1       # RNN 层数
+DROPOUT = 0.3        #  dropout 率
 ```
 
 ## 语料库格式
