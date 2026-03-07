@@ -29,12 +29,12 @@ def collate_batch(batch):
     return inputs_padded, targets_padded
 
 class Trainer:
-    def __init__(self, model, dataloader, learning_rate=0.000001, device=device):
+    def __init__(self, model, dataloader, learning_rate=0.001, device=device):
         self.model = model.to(device)
         self.dataloader = dataloader
         self.device = device
         self.criterion = nn.CrossEntropyLoss(ignore_index=0)  # 忽略 <PAD>
-        self.optimizer = optim.RMSprop(model.parameters(), lr=learning_rate)
+        self.optimizer = optim.AdamW(model.parameters(), lr=learning_rate)
         # self.optimizer = optim.Adam(model.parameters(), lr=learning_rate)
         self.best_loss = float('inf')  # 用于保存最佳模型
 
@@ -44,11 +44,14 @@ class Trainer:
             total_loss = 0
             for inp, tgt in self.dataloader:
                 inp, tgt = inp.to(self.device), tgt.to(self.device)
+
                 self.optimizer.zero_grad()
                 output = self.model(inp, tgt)  # (batch, tgt_len, vocab_size)
                 loss = self.criterion(output.view(-1, output.size(-1)), tgt.view(-1))
                 loss.backward()
+                torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=5.0)
                 self.optimizer.step()
+
                 total_loss += loss.item()
             
             avg_loss = total_loss / len(self.dataloader)
@@ -57,25 +60,25 @@ class Trainer:
             # 保存最佳模型
             if avg_loss < self.best_loss:
                 self.best_loss = avg_loss
-                torch.save(self.model.state_dict(), 'MYCHATBOT/model/chat_model.pth')
+                torch.save(self.model.state_dict(), 'model/chat_model.pth')
                 print(f"  -> Best model saved with loss {avg_loss:.4f}")
 
 if __name__ == '__main__':
     # 1. 加载词汇表
-    with open('MYCHATBOT/vocab.json', 'r', encoding='utf-8') as f:
+    with open('vocab.json', 'r', encoding='utf-8') as f:
         vocab_data = json.load(f)
     word2id = vocab_data['word2id']
     vocab_size = len(word2id)
     print(f"词汇表大小: {vocab_size}")
 
     # 2. 加载数据集
-    dataset = ChatDataset('MYCHATBOT/processed_data.json')
+    dataset = ChatDataset('processed_data.json')
     dataloader = DataLoader(dataset, batch_size=32, shuffle=True, collate_fn=collate_batch)
 
     # 3. 初始化模型
     embedding_dim = 64
-    hidden_dim = 32
-    num_layers = 2
+    hidden_dim = 64
+    num_layers = 1
     dropout = 0.4   # 如果需要 dropout，在 Encoder/Decoder 中启用
 
     encoder = Encoder(vocab_size, embedding_dim, hidden_dim, num_layers, dropout)
@@ -86,5 +89,5 @@ if __name__ == '__main__':
     trainer = Trainer(model, dataloader, learning_rate=0.001)
 
     # 5. 开始训练（直接调用一次，传入总 epoch 数）
-    num_epochs = 1000
+    num_epochs = 10000
     trainer.train(num_epochs)

@@ -17,7 +17,7 @@ def load_vocab(vocab_path):
     id2word = {int(k): v for k, v in vocab_data['id2word'].items()}
     return word2id, id2word
 
-word2id, id2word = load_vocab('MYCHATBOT/vocab.json')
+word2id, id2word = load_vocab('vocab.json')
 vocab_size = len(word2id)
 print(f"词汇表加载完成，大小: {vocab_size}")
 
@@ -114,12 +114,12 @@ def chat_loop(model):
 if __name__ == '__main__':
     # 模型参数（必须与训练时一致）
     EMBED_SIZE = 64
-    HIDDEN_SIZE = 32
-    NUM_LAYERS = 2
+    HIDDEN_SIZE = 64
+    NUM_LAYERS = 1
     DROPOUT = 0.4
     
     # 模型文件路径（根据实际情况修改）
-    model_path = 'MYCHATBOT/model/chat_model.pth'  # 如果放在当前目录可直接用 'chat_model.pth'
+    model_path = 'model/chat_model.pth'  # 如果放在当前目录可直接用 'chat_model.pth'
     
     # 加载模型
     model = load_model(model_path, vocab_size, EMBED_SIZE, HIDDEN_SIZE, NUM_LAYERS, DROPOUT)

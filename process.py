@@ -44,7 +44,7 @@ class Vocab:
         return ''.join(words)
 
 pairs = []
-with open('MYCHATBOT/corpus.txt', 'r', encoding='utf-8') as f:
+with open('corpus.txt', 'r', encoding='utf-8') as f:
     for line in f:
         line = line.strip()
         if not line:
@@ -56,7 +56,7 @@ questions = [q for q,_ in pairs]
 answers   = [a for _,a in pairs]
 all_sentences = questions + answers
 
-vocab = Vocab(all_sentences, min_freq=0)   # 过滤低频词
+vocab = Vocab(all_sentences, min_freq=1)   # 过滤低频词
 print(f"词汇表大小: {len(vocab)}")
 
 processed_data = []
@@ -69,7 +69,7 @@ for q, a in pairs:
     })
 
 
-with open('MYCHATBOT/processed_data.json', 'w', encoding='utf-8') as f:
+with open('processed_data.json', 'w', encoding='utf-8') as f:
     json.dump(processed_data, f, ensure_ascii=False, indent=2)
 
 # 同时保存词汇表，方便以后加载
@@ -77,5 +77,5 @@ vocab_dict = {
     'word2id': vocab.word2id,
     'id2word': {str(k):v for k,v in vocab.id2word.items()}  # JSON要求键为字符串
 }
-with open('MYCHATBOT/vocab.json', 'w', encoding='utf-8') as f:
+with open('vocab.json', 'w', encoding='utf-8') as f:
     json.dump(vocab_dict, f, ensure_ascii=False, indent=2)
