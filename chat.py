@@ -78,9 +78,9 @@ def generate_response(model, input_tensor, max_len=100):
             output = torch.softmax(output, dim=-1)
             
             # 根据概率分布采样
-            predicted_id = torch.multinomial(output, num_samples=1).item()
+            # predicted_id = torch.multinomial(output, num_samples=1).item()
             # 选择概率最高的词作为预测
-            # predicted_id = torch.argmax(output, dim=-1).item()
+            predicted_id = torch.argmax(output, dim=-1).item()
 
             generated_ids.append(predicted_id)
             
