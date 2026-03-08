@@ -176,7 +176,7 @@ if __name__ == '__main__':
 
     # 加载预训练权重
     # pretrained_path = 'model/pretrained_model.pth'
-    pretrained_path = 'model/prechat_model.pth'  
+    pretrained_path = 'model/prechat_model_none.pth'  
     try:
         model.load_state_dict(torch.load(pretrained_path, map_location=device))
         print(f"已加载预训练模型: {pretrained_path}")
