@@ -34,14 +34,35 @@ class Trainer:
         self.dataloader = dataloader
         self.device = device
         self.criterion = nn.CrossEntropyLoss(ignore_index=0)  # 忽略 <PAD>
-        self.optimizer = optim.AdamW(model.parameters(), lr=learning_rate)
+        self.optimizer = optim.AdamW(
+            filter(lambda p: p.requires_grad, model.parameters()),
+            lr=1e-5,  
+            weight_decay=1e-5  # 加权重衰减，防止过拟合
+        )
+        self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=50, gamma=0.9)
+
         # self.optimizer = optim.Adam(model.parameters(), lr=learning_rate)
         self.best_loss = float('inf')  # 用于保存最佳模型
+        self.patience = 50  # 早停耐心值
+        self.counter = 0  # 早停计数器
 
-    def train(self, epochs):
+    def train(self, epochs, freeze_epochs=200):
         self.model.train()
         for epoch in range(epochs):
             total_loss = 0
+            if epoch == freeze_epochs:
+                print("解冻Encoder，开始联合微调...")
+                for param in self.model.encoder.parameters():
+                    param.requires_grad = True
+                # 解冻后降低学习率
+                for param_group in self.optimizer.param_groups:
+                    param_group['lr'] = 5e-5
+                self.optimizer = optim.AdamW(
+                    self.model.parameters(),  # 此时所有可训练参数都包含
+                    lr=5e-5,
+                    weight_decay=1e-5
+                )
+                self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=50, gamma=0.9)
             for inp, tgt in self.dataloader:
                 inp, tgt = inp.to(self.device), tgt.to(self.device)
 
@@ -53,15 +74,21 @@ class Trainer:
                 self.optimizer.step()
 
                 total_loss += loss.item()
-            
+            self.scheduler.step()
             avg_loss = total_loss / len(self.dataloader)
             print(f"Epoch {epoch+1}/{epochs}, Loss: {avg_loss:.4f}")
             
             # 保存最佳模型
             if avg_loss < self.best_loss:
                 self.best_loss = avg_loss
+                self.counter = 0  # 重置早停计数器
                 torch.save(self.model.state_dict(), 'model/chat_model.pth')
                 print(f"  -> Best model saved with loss {avg_loss:.4f}")
+            else:
+                self.counter += 1
+            if self.counter >= self.patience:
+                print("早停触发，停止训练。")
+                break
 
 if __name__ == '__main__':
     # 1. 加载词汇表
@@ -85,6 +112,8 @@ if __name__ == '__main__':
     decoder = Decoder(vocab_size, embedding_dim, hidden_dim, num_layers, dropout).to(device)
     model = Seq2Seq(encoder, decoder, device)
     model.load_state_dict(torch.load('model/pretrained_model.pth', map_location=device))  # 加载预训练模型
+    for param in model.encoder.parameters():
+        param.requires_grad = False
 
     # 4. 初始化训练器
     trainer = Trainer(model, dataloader, learning_rate=0.001)
