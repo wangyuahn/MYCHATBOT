@@ -76,18 +76,19 @@ if __name__ == '__main__':
     dataloader = DataLoader(dataset, batch_size=32, shuffle=True, collate_fn=collate_batch)
 
     # 3. 初始化模型
-    embedding_dim = 512
-    hidden_dim = 512
+    embedding_dim = 256
+    hidden_dim = 1024
     num_layers = 1
     dropout = 0.5   # 如果需要 dropout，在 Encoder/Decoder 中启用
 
-    encoder = Encoder(vocab_size, embedding_dim, hidden_dim, num_layers, dropout)
-    decoder = Decoder(vocab_size, embedding_dim, hidden_dim, num_layers, dropout)
+    encoder = Encoder(vocab_size, embedding_dim, hidden_dim, num_layers, dropout).to(device)
+    decoder = Decoder(vocab_size, embedding_dim, hidden_dim, num_layers, dropout).to(device)
     model = Seq2Seq(encoder, decoder, device)
+    model.load_state_dict(torch.load('model/pretrained_model.pth', map_location=device))  # 加载预训练模型
 
     # 4. 初始化训练器
     trainer = Trainer(model, dataloader, learning_rate=0.001)
 
     # 5. 开始训练（传入总 epoch 数）
-    num_epochs = 300
+    num_epochs = 500
     trainer.train(num_epochs)

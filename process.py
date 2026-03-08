@@ -51,10 +51,14 @@ with open('corpus.txt', 'r', encoding='utf-8') as f:
             continue
         q, a = line.split('\t')
         pairs.append((q, a))
-
+knowledge_list = []
+with open('knowledge.json', 'r', encoding='utf-8') as f:
+    knowledge = json.load(f)
+    for item in knowledge:
+        knowledge_list.append(item["text"])
 questions = [q for q,_ in pairs]
 answers   = [a for _,a in pairs]
-all_sentences = questions + answers
+all_sentences = questions + answers + knowledge_list
 
 vocab = Vocab(all_sentences, min_freq=1)   # 过滤低频词
 print(f"词汇表大小: {len(vocab)}")
@@ -70,7 +74,7 @@ for q, a in pairs:
 
 
 with open('processed_data.json', 'w', encoding='utf-8') as f:
-    json.dump(processed_data, f, ensure_ascii=False, indent=2)
+     json.dump(processed_data, f, ensure_ascii=False, indent=2)
 
 # 同时保存词汇表，方便以后加载
 vocab_dict = {
