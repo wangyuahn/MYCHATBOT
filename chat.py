@@ -62,7 +62,7 @@ def load_model(model_path: str, vocab_size: int, embed_size: int = 256, hidden_s
     return model
 
 # 推理生成回答（贪婪搜索）
-def generate_response(model: Seq2Seq, input_tensor: torch.Tensor, max_len=100):
+def generate_response(model: Seq2Seq, input_tensor: torch.Tensor, max_len=1000):
     with torch.no_grad():
         input_tensor = input_tensor.to(device)
         # 编码器前向

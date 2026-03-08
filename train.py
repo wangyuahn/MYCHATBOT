@@ -5,6 +5,7 @@ from torch.utils.data import Dataset, DataLoader
 from torch.nn.utils.rnn import pad_sequence
 from typing import Optional
 import itertools  # 新增：用于循环迭代器
+import random      # 新增：用于随机选择索引
 from model import Seq2Seq, Encoder, Decoder
 
 # 复用预训练数据集定义
@@ -67,7 +68,7 @@ class Trainer:
         # 分层学习率
         encoder_params = list(model.encoder.parameters())
         decoder_params = list(model.decoder.parameters())
-        self.optimizer = optim.AdamW([
+        self.optimizer = optim.RMSprop([
             {'params': encoder_params, 'lr': encoder_lr},
             {'params': decoder_params, 'lr': decoder_lr}
         ], weight_decay=1e-5)
@@ -104,9 +105,10 @@ class Trainer:
                 if pretrain_cycle is not None:
                     pretrain_batch = next(pretrain_cycle)  # 自动循环，不会 StopIteration
                     pretrain_batch = pretrain_batch.to(self.device)
-                    # 构造输入和目标：输入去掉最后三个词，目标去掉前三个词
-                    input_pretrain = pretrain_batch[:, :-3]
-                    target_pretrain = pretrain_batch[:, 3:]
+                    # 构造输入和目标：输入为前 5 个 token，目标为后面的 token
+                    idx = random.randint(5, 15)
+                    input_pretrain = pretrain_batch[:, :idx]
+                    target_pretrain = pretrain_batch[:, idx:]
                     output_pretrain = self.model(input_pretrain, target_pretrain)
                     loss_pretrain = self.criterion(
                         output_pretrain.reshape(-1, output_pretrain.size(-1)),
@@ -175,8 +177,7 @@ if __name__ == '__main__':
     model = Seq2Seq(encoder, decoder, device)
 
     # 加载预训练权重
-    # pretrained_path = 'model/pretrained_model.pth'
-    pretrained_path = 'model/prechat_model_none.pth'  
+    pretrained_path = 'model/prechat_model.pth'  
     try:
         model.load_state_dict(torch.load(pretrained_path, map_location=device))
         print(f"已加载预训练模型: {pretrained_path}")
@@ -191,10 +192,10 @@ if __name__ == '__main__':
     trainer = Trainer(
         model=model,
         dataloader=dataloader,
-        encoder_lr=1e-5,
-        decoder_lr=5e-4,
+        encoder_lr=1e-3,
+        decoder_lr=1e-4,
         pretrain_dataloader=pretrain_dataloader,
-        pretrain_loss_weight=0.1,  # 预训练损失权重较小，主要微调问答任务
+        pretrain_loss_weight=1,  # 预训练损失权重较小，主要微调问答任务
         device=device
     )
 
