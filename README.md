@@ -14,6 +14,8 @@ MYCHATBOT/
 ├── model.py            # 模型定义
 ├── process.py          # 数据处理
 ├── processed_data.json # 处理后的数据
+└── pretrain.py         # 模型预训练
+└── knowledge.json      # 知识库
 ├── train.py            # 模型训练
 └── vocab.json          # 词汇表
 ```
@@ -58,16 +60,17 @@ python process.py
 ```
 
 这将生成 `processed_data.json` 和 `vocab.json` 文件。
-
+#### 警告，更改语料库后想应用更改必须重新训练所有模型
 ### 2. 模型训练
 
 如果需要重新训练模型，运行：
 
 ```bash
+python pretrain.py
 python train.py
 ```
 
-训练完成后，模型将保存在 `model/chat_model.pth`。
+训练完成后，预训练模型将保存在`model/prechat_model.pth`。最后的模型将保存在 `model/chat_model.pth`。
 
 ### 3. 启动聊天机器人
 
@@ -76,17 +79,11 @@ python train.py
 ```bash
 python chat.py
 ```
-可以注释掉以下代码，以取消多元的预测结果
+可以更改以下代码，将k设定成你想要的值，以控制多元的预测结果
 ```
 top_probs, top_indices = torch.topk(output, k=5, dim=-1)
-probs = top_probs[0]  # 取第一个样本的概率分布
-sampled_idx = torch.multinomial(probs, num_samples=1).item()
-predicted_id = top_indices[0, int(sampled_idx)].item()
 ```
-并取消注释一下代码，以获取最"可能"的回答
-```
-predicted_id = torch.argmax(output, dim=-1).item()
-```
+此处不需要重新训练模型
 
 输入 `exit` 退出聊天。
 
@@ -96,10 +93,10 @@ predicted_id = torch.argmax(output, dim=-1).item()
 在 `chat.py` 中，模型参数设置如下：
 
 ```python
-EMBED_SIZE = 512      # 词嵌入维度
-HIDDEN_SIZE = 512     # 隐藏层维度
+EMBED_SIZE = 256      # 词嵌入维度
+HIDDEN_SIZE = 1024     # 隐藏层维度
 NUM_LAYERS = 1       # RNN 层数
-DROPOUT = 0.3        #  dropout 率
+DROPOUT = 0.5        #  dropout 率
 ```
 
 ## 语料库格式
@@ -118,15 +115,17 @@ DROPOUT = 0.3        #  dropout 率
 - **chat.py**：聊天交互主文件，负责加载模型和处理用户输入
 - **model.py**：定义 Seq2Seq 模型，包括编码器和解码器
 - **process.py**：处理原始语料库，生成训练数据和词汇表
+- **pretrain.py**：预训练模型并保存结果
 - **train.py**：训练模型并保存结果
 - **corpus.txt**：原始语料库，包含问答对
 - **vocab.json**：词汇表，映射词与 ID
 - **processed_data.json**：处理后的数据，用于模型训练
+- **knowledge.json** 模型所用的知识库
 
 ## 注意事项
 
 1. 模型训练需要一定的计算资源，建议在 GPU 环境下运行
-2. 语料库质量直接影响模型性能，建议使用高质量、多样化的语料
+2. 语料库和知识库质量直接影响模型性能，建议使用高质量、多样化的语料
 3. 模型参数可根据实际情况进行调整以获得更好的性能
 4. 模型语料库输入和回答由 **\t** 分隔
 
