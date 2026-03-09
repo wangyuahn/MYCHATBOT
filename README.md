@@ -14,8 +14,8 @@ MYCHATBOT/
 ├── model.py            # 模型定义
 ├── process.py          # 数据处理
 ├── processed_data.json # 处理后的数据
-└── pretrain.py         # 模型预训练
-└── knowledge.json      # 知识库
+├── pretrain.py         # 模型预训练
+├── knowledge.json      # 知识库
 ├── train.py            # 模型训练
 └── vocab.json          # 词汇表
 ```
