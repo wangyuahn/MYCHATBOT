@@ -9,6 +9,7 @@ SudenMind/
 ├── __pycache__/        # Python 编译缓存
 ├── model/              # 模型存储目录
 │   └── chat_model.pth  # 训练好的模型
+│   └── prechat_model.pth  # 训练好的预训练模型
 ├── chat.py             # 聊天交互主文件
 ├── corpus.txt          # 原始语料库
 ├── model.py            # 模型定义
