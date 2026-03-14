@@ -91,7 +91,6 @@ python chat.py
 
 ```python
 def generate_response(model: Seq2Seq, input_tensor: torch.Tensor, max_len=1000, temperature=1.0):
-    # ...
 ```
 
 输入 `exit` 退出聊天。
