@@ -80,7 +80,7 @@ def generate_response(model: Seq2Seq, input_tensor: torch.Tensor, max_len=1000, 
             output = torch.softmax(output, dim=-1)
 
             # 获取概率最高的前 k 个词及其概率
-            top_probs, top_indices = torch.topk(output, k=10, dim=-1)
+            top_probs, top_indices = torch.topk(output, k=5, dim=-1)
             probs = top_probs[0]  # 取第一个样本的概率分布
 
             # 根据概率分布采样
@@ -113,8 +113,8 @@ def chat_loop(model):
         # 编码用户输入
         input_tensor = encode_sentence(user_input)  # (1, seq_len)
         
-        # 生成回答（设置 temperature=0.6 以增加多样性）
-        output_ids = generate_response(model, input_tensor, temperature=0.6)
+        # 生成回答（设置 temperature=0.4 ）
+        output_ids = generate_response(model, input_tensor, temperature=0.4)
         
         # 解码为中文
         response = decode_ids(output_ids)
@@ -122,7 +122,7 @@ def chat_loop(model):
 
 if __name__ == '__main__':
     # 模型参数（必须与训练时一致）
-    EMBED_SIZE = 256
+    EMBED_SIZE = 512
     HIDDEN_SIZE = 1024
     NUM_LAYERS = 2
     DROPOUT = 0.5

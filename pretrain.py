@@ -111,7 +111,7 @@ if __name__ == '__main__':
     dataloader = DataLoader(dataset, batch_size=512, shuffle=True, collate_fn=collate_batch)
 
     # ---------- 3. 初始化模型 ----------
-    embedding_dim = 256
+    embedding_dim = 512
     hidden_dim = 1024
     num_layers = 2
     dropout = 0.5
@@ -136,8 +136,8 @@ if __name__ == '__main__':
     trainer = Trainer(
         model=model,
         dataloader=dataloader,
-        encoder_lr=2e-4,
-        decoder_lr=4e-4,
+        encoder_lr=1e-3,
+        decoder_lr=1e-3,
         device=device
     )
 
