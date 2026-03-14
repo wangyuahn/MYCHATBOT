@@ -27,7 +27,6 @@ SudenMind/
 
 - Sequence-to-sequence generation based on Transformer+Attention model
 - Chinese word segmentation using jieba
-<!-- - Context-aware dialogue generation -->
 - Knowledge base integration for knowledge enhancement
 - Temperature parameter to control response diversity
 - Layered learning rate optimization for training
@@ -108,12 +107,11 @@ DROPOUT = 0.5        # Dropout rate
 
 ## Corpus Format
 
-The `corpus.txt` file uses the following format (using tab to separate questions and answers):
+The `corpus.txt` file uses the following format (using tab to separate quesFtions and answers):
 
 ```
-Hello	Hello, how can I help you?
-What's the weather today?
-The weather is nice today, suitable for going out.
+你好	你好！很高兴见到你。最近怎么样？
+今天天气真不错	是啊，阳光明媚，特别适合出去走走。
 ```
 
 ## Knowledge Base Format
@@ -153,12 +151,6 @@ The `knowledge.json` file uses the following format:
 4. Questions and answers in the corpus are separated by **\t**
 5. Knowledge base data will be automatically cycled for pretraining during training
 
-## Extension Suggestions
-
-1. Add more domain knowledge bases to improve the model's knowledge coverage
-2. Implement more complex dialogue management strategies to support multi-turn conversations
-3. Add sentiment analysis to generate more context-appropriate responses
-4. Integrate external APIs to provide real-time information query capabilities
 
 ## Contribution
 
