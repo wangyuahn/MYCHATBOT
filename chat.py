@@ -113,8 +113,8 @@ def chat_loop(model):
         # 编码用户输入
         input_tensor = encode_sentence(user_input)  # (1, seq_len)
         
-        # 生成回答（设置 temperature=0.7 以增加多样性）
-        output_ids = generate_response(model, input_tensor, temperature=0.7)
+        # 生成回答（设置 temperature=0.6 以增加多样性）
+        output_ids = generate_response(model, input_tensor, temperature=0.6)
         
         # 解码为中文
         response = decode_ids(output_ids)
@@ -128,8 +128,8 @@ if __name__ == '__main__':
     DROPOUT = 0.5
     
     # 模型文件路径（根据实际情况修改）
-    model_path = 'model/prechat_model.pth'  # 如果放在当前目录可直接用 'chat_model.pth'
-    # model_path = 'model/pretrained_model.pth'  # 如果放在当前目录可直接用 'pretrained_model.pth'
+    model_path = 'model/prechat_model.pth'  # 如果放在当前目录可直接用 'prechat_model.pth'
+    # model_path = 'model/chat_model.pth'  # 如果放在当前目录可直接用 'chat_model.pth'
     
     # 加载模型
     model = load_model(model_path, vocab_size, EMBED_SIZE, HIDDEN_SIZE, NUM_LAYERS, DROPOUT)

@@ -171,7 +171,7 @@ if __name__ == '__main__':
     # ---------- 4. 初始化模型 ----------
     embedding_dim = 256
     hidden_dim = 1024
-    num_layers = 1
+    num_layers = 2
     dropout = 0.5
 
     encoder = Encoder(vocab_size, embedding_dim, hidden_dim, num_layers, dropout).to(device)
@@ -179,7 +179,7 @@ if __name__ == '__main__':
     model = Seq2Seq(encoder, decoder, device)
 
     # 加载预训练权重
-    pretrained_path = 'model/chat_model.pth'  
+    pretrained_path = 'model/prechat_model.pth'  
     try:
         model.load_state_dict(torch.load(pretrained_path, map_location=device))
         print(f"已加载预训练模型: {pretrained_path}")
@@ -193,7 +193,7 @@ if __name__ == '__main__':
         encoder_lr=5e-6,
         decoder_lr=1e-4,
         knowledge_train_dataloader=knowledge_train_dataloader,
-        knowledge_train_loss_weight=0.8,  # 知识训练损失权重较小，主要微调问答任务
+        knowledge_train_loss_weight=0.3,  # 知识训练损失权重较小，主要微调问答任务
         device=device
     )
 
